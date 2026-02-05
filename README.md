@@ -27,7 +27,7 @@ Here's the template:
 ### What organization or people are asking to have this signed?
 *******************************************************************************
 Organization name and website:  
-[your text here]
+[NAVER Cloud Corp.](https://www.navercloudcorp.com/)
 
 *******************************************************************************
 ### What's the legal data that proves the organization's genuineness?
@@ -54,12 +54,12 @@ Subject: C=XX, O=MyCompany, Inc., CN=MyCompany, Inc.
 *******************************************************************************
 ### What product or service is this for?
 *******************************************************************************
-[your text here]
+NAVIX 10
 
 *******************************************************************************
 ### What's the justification that this really does need to be signed for the whole world to be able to boot it?
 *******************************************************************************
-[your text here]
+NAVIX 
 
 *******************************************************************************
 ### Why are you unable to reuse shim from another distro that is already signed?
@@ -249,7 +249,7 @@ If you are shipping an older kernel, double-check your sources; maybe you do not
 
 *******************************************************************************
 ### How does your signed kernel enforce lockdown when your system runs with Secure Boot enabled?
-Hint: If it does not, we are not likely to sign your shim.
+Hint: If it does not, we are not likely to sign your shim.
 *******************************************************************************
 [your text here]
 

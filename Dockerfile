@@ -1,4 +1,4 @@
-FROM naverlinux/navix:9
+FROM --platform=linux/amd64 naverlinux/navix:9 AS amd64
 ENV EL_PLATFORM el9
 ENV SHIM_VERSION 16.1-1.$EL_PLATFORM
 

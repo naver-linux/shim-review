@@ -1,6 +1,6 @@
 FROM --platform=linux/amd64 naverlinux/navix:10.1 AS amd64
-ENV EL_PLATFORM el10
-ENV SHIM_VERSION 16.1-1.$EL_PLATFORM
+ENV EL_PLATFORM=el10
+ENV SHIM_VERSION=16.1-2.$EL_PLATFORM
 
 COPY rpmmacros /root/.rpmmacros
 COPY shim-unsigned-x64-$SHIM_VERSION.src.rpm /

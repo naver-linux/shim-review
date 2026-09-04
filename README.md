@@ -245,7 +245,8 @@ yes
 ### Does your new chain of trust disallow booting old GRUB2 builds affected by the CVEs?
 If you had no previous signed shim, say so here. Otherwise a simple _yes_ will do.
 *******************************************************************************
-yes, yes
+* yes
+* All affected grub binaries are added into the dbx for revocation by this shim 
 
 *******************************************************************************
 ### If your boot chain of trust includes a Linux kernel:
@@ -286,9 +287,8 @@ This ensures that your new shim+GRUB2 can no longer chainload those older GRUB2 
 
 If this is your first application or you're using a new CA certificate, please say so here.
 *******************************************************************************
-We are using CA from accepted shim submission for Navix 8(#370).
-we only sign our GRUB2 bootloader which is not vulnerable to reported CVEs.
-Also, increasing SBAT global generation number protects loading vulnerable boot components.
+* next shim policy `grub,5`
+* all `grub,3` affected binaries are listed in `dbx-x86.esl`
 
 *******************************************************************************
 ### Is the Dockerfile in your repository the recipe for reproducing the building of your shim binary?

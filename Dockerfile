@@ -1,6 +1,6 @@
 FROM naverlinux/navix:9
-ENV EL_PLATFORM el9
-ENV SHIM_VERSION 16.1-1.$EL_PLATFORM
+ENV EL_PLATFORM=el9
+ENV SHIM_VERSION=16.1-2.$EL_PLATFORM
 
 COPY rpmmacros /root/.rpmmacros
 COPY shim-unsigned-x64-$SHIM_VERSION.src.rpm /

@@ -1,0 +1,22 @@
+[appstream]
+name=Navix $releasever - appstream
+baseurl=http://linux.navercorp.com/naver/10.1/$basearch/AppStream/os/
+gpgcheck=1
+enabled=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-navixofficial
+
+[baseos]
+name=Navix $releasever - baseos
+baseurl=http://linux.navercorp.com/naver/10.1/$basearch/BaseOS/os/
+gpgcheck=1
+enabled=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-navixofficial
+
+
+
+[codeready]
+name=Navix $releasever - codeready
+baseurl=http://linux.navercorp.com/naver/10.1/$basearch/CRB/os/
+gpgcheck=1
+enabled=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-navixofficial

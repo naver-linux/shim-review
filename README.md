@@ -47,19 +47,10 @@ NAVER Cloud Corp. (Korea)
 The public details of both your organization and the issuer in the EV certificate used for signing .cab files at Microsoft Hardware Dev Center File Signing Services.  
 (**not** the CA certificate embedded in your shim binary)
 
-Example:
-
-```
-Issuer: O=MyIssuer, Ltd., CN=MyIssuer EV Code Signing CA
-Subject: C=XX, O=MyCompany, Inc., CN=MyCompany, Inc.
-```
-
 ```
 Issuer: C = US, O = "DigiCert, Inc.", CN = DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1
 Subject: jurisdictionC = KR, jurisdictionST = Gyeonggi-do, jurisdictionL = Seongnam-si, businessCategory = Private Organization, serialNumber = 131111-0230662, C = KR, ST = Gyeonggi-do, L = Seongnam-si, O = NAVER Cloud Corp., CN = NAVER Cloud Corp.
-
 ```
-[your text here]
 
 *******************************************************************************
 ### What product or service is this for?
@@ -245,8 +236,7 @@ yes
 ### Does your new chain of trust disallow booting old GRUB2 builds affected by the CVEs?
 If you had no previous signed shim, say so here. Otherwise a simple _yes_ will do.
 *******************************************************************************
-* yes
-* All affected grub binaries are added into the dbx for revocation by this shim 
+this shim binary is first for x86_64 
 
 *******************************************************************************
 ### If your boot chain of trust includes a Linux kernel:
@@ -287,8 +277,9 @@ This ensures that your new shim+GRUB2 can no longer chainload those older GRUB2 
 
 If this is your first application or you're using a new CA certificate, please say so here.
 *******************************************************************************
-* next shim policy `grub,5`
-* all `grub,3` affected binaries are listed in `dbx-x86.esl`
+We are using CA from accepted shim submission for Navix 8(#370).
+we only sign our GRUB2 bootloader which is not vulnerable to reported CVEs.
+Also, increasing SBAT global generation number protects loading vulnerable boot components.
 
 *******************************************************************************
 ### Is the Dockerfile in your repository the recipe for reproducing the building of your shim binary?
@@ -317,7 +308,7 @@ Nothing changed since our last submission
 *******************************************************************************
 ### What is the SHA256 hash of your final shim binary?
 *******************************************************************************
-`9aab5871347010f7c82f8ee28be6230efe98ccb9864f7821c3807519d99b7dcf  shimx64.efi`
+`0b603cccf14735a1216aedfbc6a61129f558243c5318c10c0df2225913a67809  shimx64.efi`
 
 *******************************************************************************
 ### How do you manage and protect the keys used in your shim?
@@ -360,7 +351,7 @@ shim.navix,1,Navix,shim,16.1,dl_le@navercorp.com
 grub2
 ```
 sbat,1,SBAT Version,sbat,1,https://github.com/rhboot/shim/blob/main/SBAT.md
-grub,5,Free Software Foundation,grub,2.12,https//www.gnu.org/software/grub/
+grub,5,Free Software Foundation,grub,2.12,https://www.gnu.org/software/grub/
 grub.rh,2,Red Hat,grub2,2.12-46.el10_2,mailto:secalert@redhat.com
 grub.centos,2,Red Hat,grub2,2.12-46.el10_2,mailto:secalert@redhat.com
 grub.navix,1,Navix,grub2,2.12-46.el10_2,mailto:dl_le@navercorp.com
@@ -383,7 +374,6 @@ Hint: this is about those modules that are in the binary itself, not the `.mod` 
 all_video boot blscfg cat configfile cryptodisk echo ext2 fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt http increment iso9660 jpeg loadenv loopback linux lvm luks mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs backtrace chain usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard
 ```
 
-
 *******************************************************************************
 ### If you are using systemd-boot on arm64 or riscv, is the fix for [unverified Devicetree Blob loading](https://github.com/systemd/systemd/security/advisories/GHSA-6m6p-rjcq-334c) included?
 *******************************************************************************
@@ -393,6 +383,7 @@ We don't sign systemd-boot
 ### What is the origin and full version number of your bootloader (GRUB2 or systemd-boot or other)?
 *******************************************************************************
 grub2-2.12-46.el10_2
+(https://dlnavix.navercorp.com/navix/10/x86_64/BaseOS/os/Packages/grub2-efi-x64-2.12-46.el10_2.x86_64.rpm)
 
 *******************************************************************************
 ### If your shim launches any other components apart from your bootloader, please provide further details on what is launched.
@@ -435,4 +426,4 @@ For newcomers, the applications labeled as [*easy to review*](https://github.com
 *******************************************************************************
 ### Add any additional information you think we may need to validate this shim signing application.
 *******************************************************************************
-[your text here]
+

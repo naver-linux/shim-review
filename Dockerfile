@@ -2,6 +2,8 @@ FROM  --platform=linux/arm64 naverlinux/navix:10.1 AS arm64
 ENV EL_PLATFORM=el10
 ENV SHIM_VERSION=16.1-2.$EL_PLATFORM
 
+RUN rm -rf /etc/yum.repos.d/*.repo
+COPY navix.repo /etc/yum.repos.d/
 COPY rpmmacros /root/.rpmmacros
 COPY shim-unsigned-aarch64-$SHIM_VERSION.src.rpm /
 RUN rpm -ivh shim-unsigned-aarch64-$SHIM_VERSION.src.rpm
@@ -31,3 +33,4 @@ RUN pesign -h -P -i /built_shim/usr/share/shim/$SHIM_VERSION/aa64/shimaa64.efi
 RUN pesign -h -P -i /shimaa64.efi
 
 RUN sha256sum /built_shim/usr/share/shim/$SHIM_VERSION/aa64/shimaa64.efi /shimaa64.efi
+

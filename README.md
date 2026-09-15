@@ -236,7 +236,8 @@ yes
 ### Does your new chain of trust disallow booting old GRUB2 builds affected by the CVEs?
 If you had no previous signed shim, say so here. Otherwise a simple _yes_ will do.
 *******************************************************************************
-yes, yes
+* yes,
+* first build for aarch64 archtecture 
 
 *******************************************************************************
 ### If your boot chain of trust includes a Linux kernel:
@@ -250,7 +251,7 @@ All mentioned patches are applied
 
 *******************************************************************************
 ### How does your signed kernel enforce lockdown when your system runs with Secure Boot enabled?
-Hint: If it does not, we are not likely to sign your shim.
+Hint: If it does not, we are not likely to sign your shim.
 *******************************************************************************
 Kernel forces lockdown when secureboot is enabled
 
@@ -277,9 +278,11 @@ This ensures that your new shim+GRUB2 can no longer chainload those older GRUB2 
 
 If this is your first application or you're using a new CA certificate, please say so here.
 *******************************************************************************
-We are using CA from accepted shim submission for Navix 8(#370).
-we only sign our GRUB2 bootloader which is not vulnerable to reported CVEs.
-Also, increasing SBAT global generation number protects loading vulnerable boot components.
+This is our first application for an aarch64 shim build.
+We are not reusing the CA from the previous Navix 8 shim submission.
+This submission uses a new CA certificate for the aarch64 build.
+We only sign our GRUB2 bootloader, which is not vulnerable to the reported CVEs.
+The increased SBAT global generation prevents loading older vulnerable GRUB binaries.
 
 *******************************************************************************
 ### Is the Dockerfile in your repository the recipe for reproducing the building of your shim binary?
@@ -351,7 +354,7 @@ shim.navix,1,Navix,shim,16.1,dl_le@navercorp.com
 grub2
 ```
 sbat,1,SBAT Version,sbat,1,https://github.com/rhboot/shim/blob/main/SBAT.md
-grub,5,Free Software Foundation,grub,2.12,https//www.gnu.org/software/grub/
+grub,5,Free Software Foundation,grub,2.12,https://www.gnu.org/software/grub/
 grub.rh,2,Red Hat,grub2,2.12-46.el10_2,mailto:secalert@redhat.com
 grub.centos,2,Red Hat,grub2,2.12-46.el10_2,mailto:secalert@redhat.com
 grub.navix,1,Navix,grub2,2.12-46.el10_2,mailto:dl_le@navercorp.com
@@ -361,7 +364,7 @@ fwupd
 sbat,1,UEFI shim,sbat,1,https://github.com/rhboot/shim/blob/main/SBAT.md
 fwupd-efi,1,Firmware update daemon,fwupd-efi,1.6,https://github.com/fwupd/fwupd-efi
 fwupd-efi.centos,1,The Fedora Project,fwupd-efi,1.6-7.el10,https://www.centos.org/
-fwupd-efi.navix,1,Navix,fwupd-efi,1.6-7.el10,mail:dl_le@navercorp.com
+fwupd-efi.navix,1,Navix,fwupd-efi,1.6-7.el10,mailto:dl_le@navercorp.com
 ```
 
 *******************************************************************************

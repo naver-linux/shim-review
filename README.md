@@ -47,13 +47,6 @@ NAVER Cloud Corp. (Korea)
 The public details of both your organization and the issuer in the EV certificate used for signing .cab files at Microsoft Hardware Dev Center File Signing Services.  
 (**not** the CA certificate embedded in your shim binary)
 
-Example:
-
-```
-Issuer: O=MyIssuer, Ltd., CN=MyIssuer EV Code Signing CA
-Subject: C=XX, O=MyCompany, Inc., CN=MyCompany, Inc.
-```
-
 ```
 Issuer: C = US, O = "DigiCert, Inc.", CN = DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1
 Subject: jurisdictionC = KR, jurisdictionST = Gyeonggi-do, jurisdictionL = Seongnam-si, businessCategory = Private Organization, serialNumber = 131111-0230662, C = KR, ST = Gyeonggi-do, L = Seongnam-si, O = NAVER Cloud Corp., CN = NAVER Cloud Corp.
@@ -311,7 +304,12 @@ For example, signing new kernel's variants, UKI, systemd-boot, new certs, new CA
 
 Skip this, if this is your first application for having shim signed.
 *******************************************************************************
-Nothing changed since our last submission
+This submission updates the secure-boot chain from the previous NAVIX review. The
+changes include the shim upgrade to 16.1, an updated GRUB2/SBAT state, corrected
+embedded vendor DBX content, a refreshed primary security contact, and updated
+kernel and fwupd chain information consistent with the current NAVIX release. The
+active runtime chain remains a NAVIX-managed Secure Boot chain signed under the
+embedded NAVIX CA, with revocation enforced through the current SBAT and DBX data.
 
 *******************************************************************************
 ### What is the SHA256 hash of your final shim binary?
@@ -328,8 +326,7 @@ private key is stored on FIPS 140-2 Level 2 HSM that can be only accessible by 2
 ### Do you use EV certificates as embedded certificates in the shim?
 A _yes_ or _no_ will do. There's no penalty for the latter.
 *******************************************************************************
-No
-
+no
 *******************************************************************************
 ### Are you embedding a CA certificate in your shim?
 A _yes_ or _no_ will do. There's no penalty for the latter. However,
@@ -337,7 +334,12 @@ if _yes_: does that certificate include the X509v3 Basic Constraints
 to say that it is a CA? See the [docs](./docs/) for more guidance
 about this.
 *******************************************************************************
-No
+Yes. The shim embeds the NAVIX Secure Boot CA certificate (`navixca.cer`).
+This embedded certificate is a CA certificate and includes X.509v3 Basic
+Constraints: CA:TRUE. It is used as the trust anchor for the downstream EFI
+signing hierarchy used by NAVIX. The leaf signing certificates issued under this
+CA are used for GRUB, fwupd, and kernel/UKI EFI artifacts that are verified by
+shim under Secure Boot.
 
 *******************************************************************************
 ### Do you add a vendor-specific SBAT entry to the SBAT section in each binary that supports SBAT metadata ( GRUB2, fwupd, fwupdate, systemd-boot, systemd-stub, shim + all child shim binaries )?
@@ -359,7 +361,7 @@ shim.navix,1,Navix,shim,16.1,dl_le@navercorp.com
 grub2
 ```
 sbat,1,SBAT Version,sbat,1,https://github.com/rhboot/shim/blob/main/SBAT.md
-grub,5,Free Software Foundation,grub,2.06,https//www.gnu.org/software/grub/
+grub,5,Free Software Foundation,grub,2.06,https://www.gnu.org/software/grub/
 grub.rh,2,Red Hat,grub2,2.06-126.el9,mailto:secalert@redhat.com
 grub.navix,1,Navix,grub2,2.06-126.el9,mailto:dl_le@navercorp.com
 ```
@@ -440,4 +442,4 @@ For newcomers, the applications labeled as [*easy to review*](https://github.com
 *******************************************************************************
 ### Add any additional information you think we may need to validate this shim signing application.
 *******************************************************************************
-[your text here]
+No additional information.

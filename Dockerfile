@@ -1,11 +1,12 @@
-FROM naverlinux/navix:9
+FROM --platform=linux/amd64 naverlinux/navix:9.7 AS amd64
 ENV EL_PLATFORM=el9
 ENV SHIM_VERSION=16.1-2.$EL_PLATFORM
 
+RUN rm -rf /etc/yum.repos.d/*.repo
+COPY navix.repo /etc/yum.repos.d/
 COPY rpmmacros /root/.rpmmacros
 COPY shim-unsigned-x64-$SHIM_VERSION.src.rpm /
 RUN rpm -ivh shim-unsigned-x64-$SHIM_VERSION.src.rpm
-RUN sed -i 's/linux32 -B/linux32/g' /builddir/build/SPECS/shim-unsigned-x64.spec
 RUN dnf install -y 'dnf-command(builddep)' rpm-build
 RUN dnf builddep -y /builddir/build/SPECS/shim-unsigned-x64.spec
 RUN rpmbuild -bb /builddir/build/SPECS/shim-unsigned-x64.spec

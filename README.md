@@ -47,19 +47,10 @@ NAVER Cloud Corp. (Korea)
 The public details of both your organization and the issuer in the EV certificate used for signing .cab files at Microsoft Hardware Dev Center File Signing Services.  
 (**not** the CA certificate embedded in your shim binary)
 
-Example:
-
-```
-Issuer: O=MyIssuer, Ltd., CN=MyIssuer EV Code Signing CA
-Subject: C=XX, O=MyCompany, Inc., CN=MyCompany, Inc.
-```
-
 ```
 Issuer: C = US, O = "DigiCert, Inc.", CN = DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1
 Subject: jurisdictionC = KR, jurisdictionST = Gyeonggi-do, jurisdictionL = Seongnam-si, businessCategory = Private Organization, serialNumber = 131111-0230662, C = KR, ST = Gyeonggi-do, L = Seongnam-si, O = NAVER Cloud Corp., CN = NAVER Cloud Corp.
-
 ```
-[your text here]
 
 *******************************************************************************
 ### What product or service is this for?
@@ -238,7 +229,7 @@ yes
 Skip this, if you're not using GRUB2, otherwise do you have an entry in your GRUB2 binary similar to:  
 `grub,5,Free Software Foundation,grub,GRUB_UPSTREAM_VERSION,https://www.gnu.org/software/grub/`?
 *******************************************************************************
-yes
+yes it is set to `grub,5`
 
 *******************************************************************************
 ### Were old shims hashes provided to Microsoft for verification and to be added to future DBX updates?
@@ -246,7 +237,7 @@ yes
 If you had no previous signed shim, say so here. Otherwise a simple _yes_ will do.
 *******************************************************************************
 * yes
-* All affected grub binaries are added into the dbx for revocation by this shim 
+* All affected grub binaries are added into the dbx for revocation by this shim
 
 *******************************************************************************
 ### If your boot chain of trust includes a Linux kernel:
@@ -312,12 +303,17 @@ For example, signing new kernel's variants, UKI, systemd-boot, new certs, new CA
 
 Skip this, if this is your first application for having shim signed.
 *******************************************************************************
-Nothing changed since our last submission
+This submission updates the secure-boot chain from the previous NAVIX review. The
+changes include the shim upgrade to 16.1, the updated GRUB2/SBAT state, corrected
+embedded vendor DBX content, a refreshed primary security contact, and updated
+kernel and fwupd chain information consistent with the current NAVIX release. The
+active runtime chain remains a NAVIX-managed Secure Boot chain signed under the
+embedded NAVIX CA, with revocation enforced through the current SBAT and DBX data.
 
 *******************************************************************************
 ### What is the SHA256 hash of your final shim binary?
 *******************************************************************************
-`9aab5871347010f7c82f8ee28be6230efe98ccb9864f7821c3807519d99b7dcf  shimx64.efi`
+`a8c91c0f4b8f3fd931732f0043364306f8cc85582540d80b55e0641ab418588b  shimx64.efi`
 
 *******************************************************************************
 ### How do you manage and protect the keys used in your shim?
@@ -338,7 +334,8 @@ if _yes_: does that certificate include the X509v3 Basic Constraints
 to say that it is a CA? See the [docs](./docs/) for more guidance
 about this.
 *******************************************************************************
-No
+Yes, we include a CA and yes it includes X509v3 constraints
+
 
 *******************************************************************************
 ### Do you add a vendor-specific SBAT entry to the SBAT section in each binary that supports SBAT metadata ( GRUB2, fwupd, fwupdate, systemd-boot, systemd-stub, shim + all child shim binaries )?
@@ -360,17 +357,17 @@ shim.navix,1,Navix,shim,16.1,dl_le@navercorp.com
 grub2
 ```
 sbat,1,SBAT Version,sbat,1,https://github.com/rhboot/shim/blob/main/SBAT.md
-grub,5,Free Software Foundation,grub,2.12,https//www.gnu.org/software/grub/
+grub,5,Free Software Foundation,grub,2.12,https://www.gnu.org/software/grub/
 grub.rh,2,Red Hat,grub2,2.12-46.el10_2,mailto:secalert@redhat.com
 grub.centos,2,Red Hat,grub2,2.12-46.el10_2,mailto:secalert@redhat.com
 grub.navix,1,Navix,grub2,2.12-46.el10_2,mailto:dl_le@navercorp.com
 ```
-fwupd
+fwupd-efi
 ```
 sbat,1,UEFI shim,sbat,1,https://github.com/rhboot/shim/blob/main/SBAT.md
 fwupd-efi,1,Firmware update daemon,fwupd-efi,1.6,https://github.com/fwupd/fwupd-efi
 fwupd-efi.fedora,1,The Fedora Project,fwupd-efi,1.6-3.el10,https://src.fedoraproject.org/rpms/fwupd-efi
-fwupd-efi.navix,1,Navix,fwupd-efi,1.6-3.el10,mail:dl_le@navercorp.com
+fwupd-efi.navix,1,Navix,fwupd-efi,1.6-3.el10,mailto:dl_le@navercorp.com
 ```
 
 *******************************************************************************
@@ -383,7 +380,6 @@ Hint: this is about those modules that are in the binary itself, not the `.mod` 
 all_video boot blscfg cat configfile cryptodisk echo ext2 fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt http increment iso9660 jpeg loadenv loopback linux lvm luks mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs backtrace chain usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard
 ```
 
-
 *******************************************************************************
 ### If you are using systemd-boot on arm64 or riscv, is the fix for [unverified Devicetree Blob loading](https://github.com/systemd/systemd/security/advisories/GHSA-6m6p-rjcq-334c) included?
 *******************************************************************************
@@ -393,6 +389,7 @@ We don't sign systemd-boot
 ### What is the origin and full version number of your bootloader (GRUB2 or systemd-boot or other)?
 *******************************************************************************
 grub2-2.12-46.el10_2
+(https://dlnavix.navercorp.com/navix/10/x86_64/BaseOS/os/Packages/grub2-efi-x64-2.12-46.el10_2.x86_64.rpm)
 
 *******************************************************************************
 ### If your shim launches any other components apart from your bootloader, please provide further details on what is launched.
@@ -430,9 +427,9 @@ A reasonable timeframe of waiting for a review can reach 2-3 months. Helping us 
 
 For newcomers, the applications labeled as [*easy to review*](https://github.com/rhboot/shim-review/issues?q=is%3Aopen+is%3Aissue+label%3A%22easy+to+review%22) are recommended to start the contribution process.
 *******************************************************************************
-
+No contributions yet.
 
 *******************************************************************************
 ### Add any additional information you think we may need to validate this shim signing application.
 *******************************************************************************
-[your text here]
+No additional information.

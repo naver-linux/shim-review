@@ -307,6 +307,7 @@ For example, signing new kernel's variants, UKI, systemd-boot, new certs, new CA
 Skip this, if this is your first application for having shim signed.
 *******************************************************************************
 Nothing changed since our last submission
+first build for aarch64 
 
 *******************************************************************************
 ### What is the SHA256 hash of your final shim binary?
@@ -323,7 +324,7 @@ private key is stored on FIPS 140-2 Level 2 HSM that can be only accessible by 2
 ### Do you use EV certificates as embedded certificates in the shim?
 A _yes_ or _no_ will do. There's no penalty for the latter.
 *******************************************************************************
-No  
+no  
 
 *******************************************************************************
 ### Are you embedding a CA certificate in your shim?
@@ -332,7 +333,8 @@ if _yes_: does that certificate include the X509v3 Basic Constraints
 to say that it is a CA? See the [docs](./docs/) for more guidance
 about this.
 *******************************************************************************
-No
+Yes, the NAVIX CA certificate is embedded in the shim and includes
+X509v3 Basic Constraints: CA:TRUE.
 
 *******************************************************************************
 ### Do you add a vendor-specific SBAT entry to the SBAT section in each binary that supports SBAT metadata ( GRUB2, fwupd, fwupdate, systemd-boot, systemd-stub, shim + all child shim binaries )?

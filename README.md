@@ -279,10 +279,31 @@ This ensures that your new shim+GRUB2 can no longer chainload those older GRUB2 
 If this is your first application or you're using a new CA certificate, please say so here.
 *******************************************************************************
 This is our first application for an aarch64 shim build.
-We are not reusing the CA from the previous Navix 8 shim submission.
-This submission uses a new CA certificate for the aarch64 build.
-We only sign our GRUB2 bootloader, which is not vulnerable to the reported CVEs.
-The increased SBAT global generation prevents loading older vulnerable GRUB binaries.
+The embedded NAVIX Secure Boot CA is not new. It was previously used for
+x86_64 shim builds, and this is its first use in an aarch64 shim.
+No aarch64 GRUB2 binaries were signed with this CA before this submission.
+
+The shim is built with `SBAT_AUTOMATIC_DATE=2025021800`. Its automatic SBAT
+level is:
+
+```
+sbat,1,2025021800
+shim,4
+grub,5
+```
+
+This automatic policy rejects GRUB binaries with an upstream `grub` SBAT
+generation below 5. The compiled latest policy is:
+
+```
+sbat,1,2025051000
+shim,4
+grub,5
+grub.proxmox,2
+```
+
+No `vendor_dbx` hashes for previously signed aarch64 GRUB2 binaries are
+included because none were signed before this submission.
 
 *******************************************************************************
 ### Is the Dockerfile in your repository the recipe for reproducing the building of your shim binary?
@@ -306,13 +327,14 @@ For example, signing new kernel's variants, UKI, systemd-boot, new certs, new CA
 
 Skip this, if this is your first application for having shim signed.
 *******************************************************************************
-Nothing changed since our last submission
-first build for aarch64 
+This is the first aarch64 shim build. The NAVIX Secure Boot CA was previously
+used for x86_64 shim builds. This aarch64 shim uses the automatic SBAT level
+listed above.
 
 *******************************************************************************
 ### What is the SHA256 hash of your final shim binary?
 *******************************************************************************
-`71df41d726e5155bfbf24e0bcd1e0aa49c046084b37f522797e855b88e071144  shimaa64.efi`
+`04fb4ed73d41e0d32069e7f6cd6400028b2bbe24f21a7c73bee4d097edd7c2f7  shimaa64.efi`
 
 *******************************************************************************
 ### How do you manage and protect the keys used in your shim?
@@ -351,7 +373,7 @@ shim:
 ```
 sbat,1,SBAT Version,sbat,1,https://github.com/rhboot/shim/blob/main/SBAT.md
 shim,4,UEFI shim,shim,1,https://github.com/rhboot/shim
-shim.navix,1,Navix,shim,16.1,dl_le@navercorp.com
+shim.navix,1,Navix,shim,16.1,mailto:dl_le@navercorp.com
 ```
 grub2
 ```

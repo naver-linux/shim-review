@@ -7,9 +7,9 @@ COPY navix.repo /etc/yum.repos.d/
 COPY rpmmacros /root/.rpmmacros
 COPY shim-unsigned-aarch64-$SHIM_VERSION.src.rpm /
 RUN rpm -ivh shim-unsigned-aarch64-$SHIM_VERSION.src.rpm
-RUN sed -i 's/linux32 -B/linux32/g' /builddir/build/SPECS/shim-unsigned-aarch64.spec
 RUN dnf install -y 'dnf-command(builddep)' rpm-build
 RUN dnf builddep -y /builddir/build/SPECS/shim-unsigned-aarch64.spec
+ENV SOURCE_DATE_EPOCH=0
 RUN rpmbuild -bb /builddir/build/SPECS/shim-unsigned-aarch64.spec
 
 RUN mkdir /built_shim/
@@ -33,4 +33,3 @@ RUN pesign -h -P -i /built_shim/usr/share/shim/$SHIM_VERSION/aa64/shimaa64.efi
 RUN pesign -h -P -i /shimaa64.efi
 
 RUN sha256sum /built_shim/usr/share/shim/$SHIM_VERSION/aa64/shimaa64.efi /shimaa64.efi
-

@@ -279,8 +279,19 @@ This ensures that your new shim+GRUB2 can no longer chainload those older GRUB2 
 
 If this is your first application or you're using a new CA certificate, please say so here.
 *******************************************************************************
-* next shim policy `grub,5`
-* all `grub,3` affected binaries are listed in `dbx-x86.esl`
+The shim uses `SBAT_AUTOMATIC_DATE=2025021800`, whose automatic SBAT level
+enforces `grub,5`:
+
+```
+sbat,1,2025021800
+shim,4
+grub,5
+```
+
+The embedded `dbx-x86.esl` also contains PE/Authenticode SHA-256 digests for
+the x86_64 EFI files from these provided GRUB RPMs, each reporting upstream
+`grub,3`: `2.06-77.el9`, `2.06-80.el9_4`, `2.06-82.el9_4`, `2.06-92.el9`,
+`2.06-93.el9_5`, `2.06-94.el9_5`, and `2.06-104.el9_6`.
 
 *******************************************************************************
 ### Is the Dockerfile in your repository the recipe for reproducing the building of your shim binary?
@@ -314,7 +325,7 @@ embedded NAVIX CA, with revocation enforced through the current SBAT and DBX dat
 *******************************************************************************
 ### What is the SHA256 hash of your final shim binary?
 *******************************************************************************
-`8f79b1724c58838569733a8ed1611463d0aec9bd6d5bdc6c306f7d0a43cbdc66  shimx64.efi`
+`f81726cf2311b2a75ca7ea2303a5a0f3337e35eb8fe1c72f0797a45f66637d63  shimx64.efi`
 
 *******************************************************************************
 ### How do you manage and protect the keys used in your shim?
@@ -336,10 +347,7 @@ about this.
 *******************************************************************************
 Yes. The shim embeds the NAVIX Secure Boot CA certificate (`navixca.cer`).
 This embedded certificate is a CA certificate and includes X.509v3 Basic
-Constraints: CA:TRUE. It is used as the trust anchor for the downstream EFI
-signing hierarchy used by NAVIX. The leaf signing certificates issued under this
-CA are used for GRUB, fwupd, and kernel/UKI EFI artifacts that are verified by
-shim under Secure Boot.
+Constraints: CA:TRUE.
 
 *******************************************************************************
 ### Do you add a vendor-specific SBAT entry to the SBAT section in each binary that supports SBAT metadata ( GRUB2, fwupd, fwupdate, systemd-boot, systemd-stub, shim + all child shim binaries )?
@@ -356,7 +364,7 @@ shim:
 ```
 sbat,1,SBAT Version,sbat,1,https://github.com/rhboot/shim/blob/main/SBAT.md
 shim,4,UEFI shim,shim,1,https://github.com/rhboot/shim
-shim.navix,1,Navix,shim,16.1,dl_le@navercorp.com
+shim.navix,1,Navix,shim,16.1,mailto:dl_le@navercorp.com
 ```
 grub2
 ```
@@ -368,10 +376,14 @@ grub.navix,1,Navix,grub2,2.06-126.el9,mailto:dl_le@navercorp.com
 fwupd
 ```
 sbat,1,UEFI shim,sbat,1,https://github.com/rhboot/shim/blob/main/SBAT.md
-fwupd-efi,1,Firmware update daemon,fwupd-efi,1.4,https://github.com/fwupd/fwupd-efi
-fwupd-efi.rhel,1,Red Hat Enterprise Linux,fwupd,1.9.31,mail:secalert@redhat.com
-fwupd-efi.navix,1,Navix,fwupd,1.9.31,mail:dl_le@navercorp.com
+fwupd-efi,1,Firmware update daemon,fwupd-efi,1.7,https://github.com/fwupd/fwupd-efi
+fwupd-efi.navix,1,Navix,fwupd,2.0.19,mailto:dl_le@navercorp.com
 ```
+The initial Navix 9 build used `fwupd-1.9.31-1.el9`. The Rocky Linux 9.8
+upstream `fwupd-2.0.19-2.el9_8` package had a build issue that omitted SBAT
+metadata from its EFI files; Rocky Linux's corresponding package has the same
+issue. Navix is updating to `fwupd-2.0.19-3.el9_8`; the SBAT entries above were
+extracted from that RPM.
 
 *******************************************************************************
 ### If shim is loading GRUB2 bootloader, which modules are built into your signed GRUB2 image?
@@ -405,19 +417,22 @@ grub2-2.06-126.el9
 ### If your shim launches any other components apart from your bootloader, please provide further details on what is launched.
 Hint: The most common case here will be a firmware updater like fwupd.
 *******************************************************************************
-Also launches fwupd
+grub2 verifies signatures on booted kernels via shim. fwupd does not include code to launch other binaries, it can only load UEFI Capsule updates.
 
 *******************************************************************************
 ### If your GRUB2 or systemd-boot launches any other binaries that are not the Linux kernel in SecureBoot mode, please provide further details on what is launched and how it enforces Secureboot lockdown.
 Skip this, if you're not using GRUB2 or systemd-boot.
 *******************************************************************************
-grub2 verifies signatures on booted kernels via shim. fwupd does not include code to launch other binaries, it can only load UEFI Capsule updates.
+GRUB verifies booted kernels via shim_lock. fwupd stages UEFI Capsule updates;
+its GRUB menu entry chainloads the configured EFI path when an update is pending.
 
 *******************************************************************************
 ### How do the launched components prevent execution of unauthenticated code?
 Summarize in one or two sentences, how your secure bootchain works on higher level.
 *******************************************************************************
-All component has .sbat self checks and secureboot validation
+GRUB verifies kernels via shim_lock. The fwupd EFI SBAT metadata is listed above;
+confirm the production-selected EFI path and its signature status on the deployed
+system.
 
 *******************************************************************************
 ### Does your shim load any loaders that support loading unsigned kernels (e.g. certain GRUB2 configurations)?
@@ -437,7 +452,7 @@ A reasonable timeframe of waiting for a review can reach 2-3 months. Helping us 
 
 For newcomers, the applications labeled as [*easy to review*](https://github.com/rhboot/shim-review/issues?q=is%3Aopen+is%3Aissue+label%3A%22easy+to+review%22) are recommended to start the contribution process.
 *******************************************************************************
-
+No contributions yet.
 
 *******************************************************************************
 ### Add any additional information you think we may need to validate this shim signing application.

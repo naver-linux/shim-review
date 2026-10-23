@@ -9,6 +9,7 @@ COPY shim-unsigned-x64-$SHIM_VERSION.src.rpm /
 RUN rpm -ivh shim-unsigned-x64-$SHIM_VERSION.src.rpm
 RUN dnf install -y 'dnf-command(builddep)' rpm-build
 RUN dnf builddep -y /builddir/build/SPECS/shim-unsigned-x64.spec
+ENV SOURCE_DATE_EPOCH=0
 RUN rpmbuild -bb /builddir/build/SPECS/shim-unsigned-x64.spec
 
 RUN mkdir /built_shim/

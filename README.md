@@ -270,7 +270,9 @@ Temporary ephemeral key is generated and used at module signing during kernel bu
 ### If you use vendor_db functionality of providing multiple certificates and/or hashes please briefly describe your certificate setup.
 ### If there are allow-listed hashes please provide exact binaries for which hashes are created via file sharing service, available in public with anonymous access for verification.
 *******************************************************************************
-We don't use vendor_db 
+The vendor_db allow-list is empty. The embedded NAVIX CA certificate and the
+vendor_dbx deny-list are separate from this allow-list; vendor_dbx contains six
+PE/Authenticode SHA-256 digests.
 
 *******************************************************************************
 ### If you are re-using the CA certificate from your last shim binary, you will need to add the hashes of the previous GRUB2 binaries exposed to the CVEs mentioned earlier to vendor_dbx in shim. Please describe your strategy.
@@ -278,8 +280,44 @@ This ensures that your new shim+GRUB2 can no longer chainload those older GRUB2 
 
 If this is your first application or you're using a new CA certificate, please say so here.
 *******************************************************************************
-* next shim policy `grub,5`
-* all `grub,3` affected binaries are listed in `dbx-x86.esl`
+We reuse the NAVIX Secure Boot CA. The obsolete `SBAT_AUTOMATIC_DATE=2023012900`
+overrides have been removed from both `%build` and `%install` in the supplied
+SRPM spec. The rebuilt shim uses the upstream shim 16.1 automatic policy:
+
+```text
+sbat,1,2024040900
+shim,4
+grub,4
+grub.peimage,2
+```
+
+The opt-in latest policy is `2025051000` (`shim,4`, `grub,5`,
+`grub.proxmox,2`). We do not claim that `grub,5` is the automatic policy, or that
+putting `grub,5` in a new GRUB binary's own SBAT section revokes older binaries.
+The automatic policy rejects older `grub,3` binaries through SBAT verification.
+
+The 456-byte `dbx-x86.esl` contains the following six digests, unchanged from the
+previous revision. Each row describes a separately supplied historical signed
+`grubx64.efi` (x86_64, SBAT `grub,3`); the supplied `pesign` output reports
+`Navix Grub2 Signing Cert`. Raw file hashes are not the PE/Authenticode digests
+stored in the ESL.
+
+| GRUB package version | Corresponding RPM URL | Raw EFI SHA-256 | PE/Authenticode SHA-256 in vendor_dbx |
+|---|---|---|---|
+| `2.06-77.el9` | [RPM](https://dlnavix.navercorp.com/navix/9.4/x86_64/BaseOS/os/Packages/grub2-efi-x64-2.06-77.el9.x86_64.rpm) | `4499dd714503516a42e9561731cd0e3df0720dbc544295a78a38d61feb9e56ab` | `8cc764b5d1674842747efc64ddc99d18d8b0bea862839563d4b269569047a1ac` |
+| `2.06-80.el9_4` | [RPM](https://dlnavix.navercorp.com/navix/9.4/x86_64/Updates/os/Packages/grub2-efi-x64-2.06-80.el9_4.x86_64.rpm) | `a3fc0168f90a4c480ceb7d23c5e348749b67f57f2aa18134d79f7cf510f54ae0` | `fc93078713875af92b8ba3ec587cc646e5358b27add9c221eefef4ff1ae03127` |
+| `2.06-82.el9_4` | [RPM](https://dlnavix.navercorp.com/navix/9.4/x86_64/Updates/os/Packages/grub2-efi-x64-2.06-82.el9_4.x86_64.rpm) | `888bd39ce896ee714cecb84f6f301e9a262840eeb6d38add9461a2a74be59dee` | `1d93e9add043784ff170ea76094c8f328aaced72f6dc3c1456b9bbbd5157fba2` |
+| `2.06-92.el9` | [RPM](https://dlnavix.navercorp.com/navix/9.5/x86_64/BaseOS/os/Packages/grub2-efi-x64-2.06-92.el9.x86_64.rpm) | `8bc01b000b3f3afffa22d81afb8ca742c8b1ea67f6d8153ff7a337935a98d0fa` | `da85c324641774626ffe23ea78917e77d179c35cdb4e629650f24f5af06c27b9` |
+| `2.06-93.el9_5` | [RPM](https://dlnavix.navercorp.com/navix/9.5/x86_64/Updates/os/Packages/grub2-efi-x64-2.06-93.el9_5.x86_64.rpm) | `cbc8bcf06a6e44b373cfe2772271561ea98a6e53fdae9966592a7c647cfd332a` | `eaa2c926b0e464edf34119e4b6132814636cd0b743c795b798e704ce0bc8e4f1` |
+| `2.06-94.el9_5` | [RPM](https://dlnavix.navercorp.com/navix/9.5/x86_64/Updates/os/Packages/grub2-efi-x64-2.06-94.el9_5.x86_64.rpm) | `457280cfd6a06e12a25b43f4dc12ca94c63fac715a37524cd5534e839486306a` | `904831f1f17eaf6c34d3762a5c9472c0962b0d489ba7eb0b4583412e1f9aceb0` |
+
+The URLs identify corresponding package versions, not verified downloads of the
+historical signed files: the currently downloaded RPM EFI payloads have different
+digests. The supplied `pesign` output reports signer metadata but says that the
+detached content cannot be verified. Immutable historical signed artifacts,
+cryptographic signature verification, and per-entry CVE/revocation rationale
+remain outstanding. We therefore do not claim that this DBX table proves complete
+coverage of every vulnerable binary signed under the reused CA.
 
 *******************************************************************************
 ### Is the Dockerfile in your repository the recipe for reproducing the building of your shim binary?
@@ -289,7 +327,9 @@ Hint: Prefer using *frozen* packages for your toolchain, since an update to GCC,
 
 If your shim binaries can't be reproduced using the provided Dockerfile, please explain why that's the case, what the differences would be and what build environment (OS and toolchain) is being used to reproduce this build? In this case please write a detailed guide, how to setup this build environment from scratch.
 *******************************************************************************
-`Dockerfile` is included to reproduce our build.
+`Dockerfile` is included to reproduce our build with `SOURCE_DATE_EPOCH=0`.
+The `amd64` stage builds and extracts the RPM payload; the final `verification`
+stage checks it against the submitted EFI using `diff` and `cmp`.
 
 *******************************************************************************
 ### Which files in this repo are the logs for your build?
@@ -313,7 +353,7 @@ embedded NAVIX CA, with revocation enforced through the current SBAT and DBX dat
 *******************************************************************************
 ### What is the SHA256 hash of your final shim binary?
 *******************************************************************************
-`a8c91c0f4b8f3fd931732f0043364306f8cc85582540d80b55e0641ab418588b  shimx64.efi`
+`0545b63d0f60a4dc642ea29207f3859425364de4d6e674fb1947a2e87dfa7a8a  shimx64.efi`
 
 *******************************************************************************
 ### How do you manage and protect the keys used in your shim?

@@ -1,6 +1,7 @@
 FROM --platform=linux/amd64 naverlinux/navix:10.1 AS amd64
 ENV EL_PLATFORM=el10
 ENV SHIM_VERSION=16.1-2.$EL_PLATFORM
+ENV SOURCE_DATE_EPOCH=0
 
 RUN rm -rf /etc/yum.repos.d/*.repo
 COPY navix.repo /etc/yum.repos.d/
@@ -12,9 +13,10 @@ RUN dnf builddep -y /builddir/build/SPECS/shim-unsigned-x64.spec
 RUN rpmbuild -bb /builddir/build/SPECS/shim-unsigned-x64.spec
 
 RUN mkdir /built_shim/
-COPY shimx64.efi /
-
 RUN rpm2cpio /builddir/build/RPMS/x86_64/shim-unsigned-x64-$SHIM_VERSION.x86_64.rpm | cpio -diu -D /built_shim
+
+FROM amd64 AS verification
+COPY shimx64.efi /
 RUN ls -l /*.efi /built_shim/usr/share/shim/$SHIM_VERSION/*/shim*.efi
 
 RUN sha256sum /built_shim/usr/share/shim/$SHIM_VERSION/x64/shimx64.efi /shimx64.efi
